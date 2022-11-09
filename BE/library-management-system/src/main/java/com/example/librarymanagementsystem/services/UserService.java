@@ -1,6 +1,7 @@
 package com.example.librarymanagementsystem.services;
 
 import com.example.librarymanagementsystem.domain.AppUser;
+import com.example.librarymanagementsystem.dto.requestDTO.ChangePasswordRequestDTO;
 import com.example.librarymanagementsystem.dto.requestDTO.mapper.UserRequestMapper;
 import com.example.librarymanagementsystem.dto.responseDTO.mapper.UserResponseMapper;
 import com.example.librarymanagementsystem.dto.requestDTO.RegisterRequestDTO;
@@ -13,6 +14,8 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -29,10 +32,15 @@ public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
 
-    public UserService(UserResponseMapper userResponseMapper, UserRequestMapper userRequestMapper, UserRepository userRepository) {
+    private final PasswordEncoder passwordEncoder;
+
+
+
+    public UserService(UserResponseMapper userResponseMapper, UserRequestMapper userRequestMapper, UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userResponseMapper = userResponseMapper;
         this.userRequestMapper = userRequestMapper;
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public RegisterResponseDTO registerUserService(final RegisterRequestDTO registerRequestDTO){
@@ -45,6 +53,16 @@ public class UserService implements UserDetailsService {
                     .mapRegisterRequestDTOtoAppUser(registerRequestDTO));
 
             return userResponseMapper.mapAppUserToRegisterResponseDTO(newUser);
+        }
+        return null;
+    }
+
+    public AppUser changePasswordService(final ChangePasswordRequestDTO changePasswordRequestDTO){
+        AppUser appUser = userRepository.findAppUserByUsername(changePasswordRequestDTO.getUsername()).orElse(null);
+
+        if(appUser != null){
+            appUser.setPassword(passwordEncoder.encode(changePasswordRequestDTO.getNewPassword()));
+            return userRepository.save(appUser);
         }
         return null;
     }

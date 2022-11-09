@@ -1,6 +1,8 @@
 package com.example.librarymanagementsystem.controllers;
 
 import com.example.librarymanagementsystem.constants.SecurityConstants;
+import com.example.librarymanagementsystem.domain.AppUser;
+import com.example.librarymanagementsystem.dto.requestDTO.ChangePasswordRequestDTO;
 import com.example.librarymanagementsystem.dto.requestDTO.LoginRequestDTO;
 import com.example.librarymanagementsystem.dto.responseDTO.LoginResponseDTO;
 import com.example.librarymanagementsystem.dto.requestDTO.RegisterRequestDTO;
@@ -79,4 +81,19 @@ public class UserController {
         return new ResponseEntity<>(registerResponseDTO,HttpStatus.CREATED);
     }
 
+    @PutMapping("/edit")
+    public HttpStatus changePassword(@RequestBody final ChangePasswordRequestDTO changePasswordRequestDTO){
+        logger.info("In changePassword controller");
+
+        if(!ValidateRequest.validateChangePasswordRequestDTO(changePasswordRequestDTO)){
+            return HttpStatus.BAD_REQUEST;
+        }
+
+        AppUser appUser = userService.changePasswordService(changePasswordRequestDTO);
+
+        if(appUser == null){
+            return HttpStatus.BAD_REQUEST;
+        }
+        return HttpStatus.CREATED;
+    }
 }

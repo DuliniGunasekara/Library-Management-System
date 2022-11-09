@@ -37,9 +37,10 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable).authorizeRequests(auth -> {
             auth.antMatchers("/api/user/register").hasAnyAuthority(UserRole.LIBRARIAN.toString());
+            auth.antMatchers("/api/user/edit").hasAnyAuthority(UserRole.LIBRARIAN.toString(),UserRole.MEMBER.toString());
             auth.antMatchers("/api/user/login").permitAll();
+            auth.antMatchers("/api/book/**").permitAll();
         }).sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)).httpBasic(Customizer.withDefaults()).apply(jwtSecurityConfigurerAdapter());
-
         return http.build();
     }
 }
