@@ -58,6 +58,7 @@ public class UserService implements UserDetailsService {
     }
 
     public AppUser changePasswordService(final ChangePasswordRequestDTO changePasswordRequestDTO){
+        logger.info("In changePasswordService method");
         AppUser appUser = userRepository.findAppUserByUsername(changePasswordRequestDTO.getUsername()).orElse(null);
 
         if(appUser != null){
