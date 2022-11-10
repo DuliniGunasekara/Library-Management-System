@@ -1,7 +1,6 @@
-package com.example.librarymanagementsystem.dto.requestDTO;
+package com.example.librarymanagementsystem.dto.responseDTO;
 
 import com.example.librarymanagementsystem.constants.UserRole;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -9,6 +8,6 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class RegisterRequestDTO extends UserRequestDTO{
+public class EditUserResponseDTO extends UserResponseDTO {
     private String userRole;
 }

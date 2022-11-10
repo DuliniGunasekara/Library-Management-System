@@ -17,7 +17,7 @@ public class AppUser {
     @Indexed(unique = true)
     protected String username;
     protected String password;
-    protected final UserRole userRole;
+    protected  UserRole userRole;
 
     public AppUser(UserRole userRole) {
         this.userRole = userRole;

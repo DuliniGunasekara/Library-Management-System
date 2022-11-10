@@ -1,21 +1,26 @@
 package com.example.librarymanagementsystem.services;
 
+import com.example.librarymanagementsystem.constants.ErrorMessage;
+import com.example.librarymanagementsystem.constants.UserRole;
 import com.example.librarymanagementsystem.domain.AppUser;
 import com.example.librarymanagementsystem.dto.requestDTO.ChangePasswordRequestDTO;
-import com.example.librarymanagementsystem.dto.requestDTO.mapper.UserRequestMapper;
-import com.example.librarymanagementsystem.dto.responseDTO.mapper.UserResponseMapper;
+import com.example.librarymanagementsystem.dto.requestDTO.EditUserRequestDTO;
 import com.example.librarymanagementsystem.dto.requestDTO.RegisterRequestDTO;
+import com.example.librarymanagementsystem.dto.requestDTO.mapper.UserRequestMapper;
+import com.example.librarymanagementsystem.dto.responseDTO.EditUserResponseDTO;
 import com.example.librarymanagementsystem.dto.responseDTO.RegisterResponseDTO;
+import com.example.librarymanagementsystem.dto.responseDTO.UserResponseDTO;
+import com.example.librarymanagementsystem.dto.responseDTO.mapper.UserResponseMapper;
 import com.example.librarymanagementsystem.repositories.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -43,46 +48,66 @@ public class UserService implements UserDetailsService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public RegisterResponseDTO registerUserService(final RegisterRequestDTO registerRequestDTO){
+    public UserResponseDTO registerUserService(final RegisterRequestDTO registerRequestDTO){
         logger.info("In registerUserService method");
 
-        AppUser existingUser = userRepository.findAppUserByUsername(registerRequestDTO.getUsername()).orElse(null);
+        AppUser existingUser = getExistingUser(registerRequestDTO.getUsername());
 
         if(existingUser == null){
             AppUser newUser = userRepository.save(userRequestMapper
                     .mapRegisterRequestDTOtoAppUser(registerRequestDTO));
-
-            return userResponseMapper.mapAppUserToRegisterResponseDTO(newUser);
+            return userResponseMapper.mapAppUserToUserResponseDTO(newUser);
         }
         return null;
     }
+
+    public EditUserResponseDTO editUserService(final String username, final EditUserRequestDTO editUserRequestDTO){
+        logger.info("In editUserService method");
+
+        AppUser existingUser = getExistingUser(username);
+
+        if(existingUser == null){
+            logger.error(ErrorMessage.USERNAME_NOT_FOUND);
+            throw new UsernameNotFoundException(ErrorMessage.USERNAME_NOT_FOUND);
+        }
+        existingUser.setUsername(editUserRequestDTO.getUsername());
+        existingUser.setUserRole(UserRole.valueOf(editUserRequestDTO.getUserRole()));
+        AppUser updatedUser = userRepository.save(existingUser);
+        return userResponseMapper.mapAppUserToEditUserResponseDTO(updatedUser);
+    }
+
 
     public AppUser changePasswordService(final ChangePasswordRequestDTO changePasswordRequestDTO){
         logger.info("In changePasswordService method");
-        AppUser appUser = userRepository.findAppUserByUsername(changePasswordRequestDTO.getUsername()).orElse(null);
+        AppUser appUser = getExistingUser(SecurityContextHolder.getContext().getAuthentication().getName());
 
-        if(appUser != null){
-            appUser.setPassword(passwordEncoder.encode(changePasswordRequestDTO.getNewPassword()));
-            return userRepository.save(appUser);
+        if(appUser == null || !passwordEncoder.matches(changePasswordRequestDTO.getOldPassword(),appUser.getPassword())){
+            return null;
         }
-        return null;
+
+        appUser.setPassword(passwordEncoder.encode(changePasswordRequestDTO.getNewPassword()));
+        return userRepository.save(appUser);
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String username) {
         logger.info("In loadUserByUsername service method");
 
-        AppUser existingUser = userRepository.findAppUserByUsername(username).orElse(null);
+        AppUser existingUser = getExistingUser(username);
         List<SimpleGrantedAuthority> simpleGrantedAuthorities = new ArrayList<>();
 
         if (existingUser == null) {
-            String msg = "Username " + username + " not found!";
-            logger.error(msg);
-            throw new UsernameNotFoundException(msg);
+            logger.error(ErrorMessage.USERNAME_NOT_FOUND);
+            throw new UsernameNotFoundException(ErrorMessage.USERNAME_NOT_FOUND);
 
         } else {
             simpleGrantedAuthorities.add(new SimpleGrantedAuthority(existingUser.getUserRole().toString()));
         }
         return new User(existingUser.getUsername(), existingUser.getPassword(), simpleGrantedAuthorities);
     }
+
+    public AppUser getExistingUser(final String username){
+        return userRepository.findAppUserByUsername(username).orElse(null);
+    }
+
 }

@@ -8,9 +8,7 @@ import lombok.experimental.Accessors;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ChangePasswordRequestDTO{
-    private String oldPassword;
-    private String newPassword;
-    private String confirmPassword;
-
+public class UserRequestDTO {
+    private String username;
+    private String password;
 }
