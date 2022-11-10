@@ -37,4 +37,12 @@ public class ValidateRequest {
         }
         return false;
     }
+
+    public static boolean validateBookRequestDTO(final BookRequestDTO bookRequestDTO){
+        if(StringUtils.hasLength(bookRequestDTO.getIsbnNumber()) &&
+                StringUtils.hasLength(bookRequestDTO.getName())){
+            return true;
+        }
+        return false;
+    }
 }
