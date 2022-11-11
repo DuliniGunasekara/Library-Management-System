@@ -2,42 +2,41 @@ package com.example.librarymanagementsystem.util;
 
 public class ErrorMessageGenerator {
 
-    public static String userNameNotFound(final String username){
+    private ErrorMessageGenerator(){}
+
+    public static String userNameNotFound(final String username) {
         return "Username " + username + " not found!";
     }
 
-    public static String userNotFound(final String id){
+    public static String userNotFound(final String id) {
         return "User with id: " + id + " not found!";
     }
 
-    public static String bookNotFound(final String id){
+    public static String bookNotFound(final String id) {
         return "Book with id:" + id + " not found!";
     }
 
-    public static String bookAlreadyExisting(final String isbnNumber){
+    public static String bookAlreadyExisting(final String isbnNumber) {
         return "Book with ISBN:" + isbnNumber + " is already existing!";
     }
 
-    public static String memberIsNotEligible(final String username){
+    public static String memberIsNotEligible(final String username) {
         return "Member with username:" + username + " is not eligible!";
     }
 
-    public static String requestedBooksAreNotAvailable(){
+    public static String requestedBooksAreNotAvailable() {
         return "Requested books are not available!";
     }
 
-    public static String bookHistoryNotFound(){
+    public static String bookHistoryNotFound() {
         return "Book history not found!";
     }
 
-    public static String userNotFound(){
-        return "User not found!";
-    }
-    public static String usernameNotAvailable(){
+    public static String usernameNotAvailable() {
         return "Username not available!";
     }
 
-    public static String bookISBNisExisting(){
+    public static String bookISBNisExisting() {
         return "Book ISBN is existing";
     }
 }

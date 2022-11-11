@@ -13,16 +13,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
 public class BookService {
     private static final Logger logger = LoggerFactory.getLogger(BookService.class);
 
-    private BookRepository bookRepository;
+    private final BookRepository bookRepository;
 
-    private BookResponseMapper bookResponseMapper;
-    private BookRequestMapper bookRequestMapper;
+    private final BookResponseMapper bookResponseMapper;
+    private final BookRequestMapper bookRequestMapper;
 
     public BookService(BookRepository bookRepository, BookResponseMapper bookResponseMapper, BookRequestMapper bookRequestMapper) {
         this.bookRepository = bookRepository;
@@ -30,36 +31,34 @@ public class BookService {
         this.bookRequestMapper = bookRequestMapper;
     }
 
-    public List<BookResponseDTO> getAllBooksService(){
+    public List<BookResponseDTO> getAllBooksService() {
         logger.info("In getAllBooksService method");
 
         List<Book> bookList = bookRepository.findAll();
-
-        if(bookList.isEmpty()){
-           return null;
+        if (bookList.isEmpty()) {
+            return Collections.emptyList();
         }
-
-        return bookList.stream().map(book-> bookResponseMapper.mapBookToBookResponseDTO(book)).toList();
+        return bookList.stream().map(bookResponseMapper::mapBookToBookResponseDTO).toList();
     }
 
-    public BookResponseDTO getBookByIdService(final String id){
+    public BookResponseDTO getBookByIdService(final String id) {
         logger.info("In getBookByIdService method");
 
-        Book book = bookRepository.findBookById(id).orElse(null);
+        Book book = getBookById(id);
 
-        if(book == null){
-           logger.error(ErrorMessageGenerator.bookNotFound(id));
-           return null;
+        if (book == null) {
+            logger.error(ErrorMessageGenerator.bookNotFound(id));
+            return null;
         }
         return bookResponseMapper.mapBookToBookResponseDTO(book);
     }
 
-    public BookResponseDTO addBookService(final BookRequestDTO bookRequestDTO){
+    public BookResponseDTO addBookService(final BookRequestDTO bookRequestDTO) {
         logger.info("In getBookByIdService method");
 
         Book book = bookRepository.findBookByIsbnNumber(bookRequestDTO.getIsbnNumber()).orElse(null);
 
-        if(book != null){
+        if (book != null) {
             logger.error(ErrorMessageGenerator.bookAlreadyExisting(bookRequestDTO.getIsbnNumber()));
             return null;
         }
@@ -69,18 +68,18 @@ public class BookService {
         return bookResponseMapper.mapBookToBookResponseDTO(newBook);
     }
 
-    public BookResponseDTO editBookService(final String id,final BookRequestDTO bookRequestDTO){
+    public BookResponseDTO editBookService(final String id, final BookRequestDTO bookRequestDTO) {
         logger.info("In editBookService method");
 
-        Book book = bookRepository.findBookById(id).orElse(null);
+        Book book = getBookById(id);
 
-        if(book == null){
+        if (book == null) {
             logger.error(ErrorMessageGenerator.bookNotFound(id));
             return null;
         }
-        if(!book.getIsbnNumber().equals(bookRequestDTO.getIsbnNumber())){
+        if (!book.getIsbnNumber().equals(bookRequestDTO.getIsbnNumber())) {
             Book checkISBNBook = bookRepository.findBookByIsbnNumber(bookRequestDTO.getIsbnNumber()).orElse(null);
-            if(checkISBNBook != null){
+            if (checkISBNBook != null) {
                 logger.error(ErrorMessageGenerator.bookISBNisExisting());
                 return null;
             }
@@ -93,12 +92,12 @@ public class BookService {
         return bookResponseMapper.mapBookToBookResponseDTO(editedBook);
     }
 
-    public BookDeleteResponseDTO deleteBookService(final String id){
+    public BookDeleteResponseDTO deleteBookService(final String id) {
         logger.info("In deleteBookService method");
 
-        Book book = bookRepository.findBookById(id).orElse(null);
+        Book book = getBookById(id);
 
-        if(book == null){
+        if (book == null) {
             logger.error(ErrorMessageGenerator.bookNotFound(id));
             return null;
         }
@@ -107,15 +106,19 @@ public class BookService {
         return bookResponseMapper.mapBookToBookDeleteResponseDTO(book);
     }
 
-    public void updateBookAvailability(final Book book){
+    public void updateBookAvailability(final Book book) {
 
-            if(book.getBookStatus().equals(BookStatus.AVAILABLE)){
-                book.setBookStatus(BookStatus.NOT_AVAILABLE);
-            }else{
-                book.setBookStatus(BookStatus.AVAILABLE);
-            }
-            bookRepository.save(book);
+        if (book.getBookStatus().equals(BookStatus.AVAILABLE)) {
+            book.setBookStatus(BookStatus.NOT_AVAILABLE);
+        } else {
+            book.setBookStatus(BookStatus.AVAILABLE);
         }
+        bookRepository.save(book);
+    }
+
+    public Book getBookById(final String id) {
+        return bookRepository.findBookById(id).orElse(null);
+    }
 }
 
 

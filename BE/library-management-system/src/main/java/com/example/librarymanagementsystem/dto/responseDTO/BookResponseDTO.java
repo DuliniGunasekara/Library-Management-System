@@ -1,6 +1,5 @@
 package com.example.librarymanagementsystem.dto.responseDTO;
 
-import com.example.librarymanagementsystem.constants.BookStatus;
 import lombok.Getter;
 import lombok.Setter;
 

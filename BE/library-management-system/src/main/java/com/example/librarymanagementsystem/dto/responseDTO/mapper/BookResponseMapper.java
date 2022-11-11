@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class BookResponseMapper {
 
-    public BookResponseDTO mapBookToBookResponseDTO(final Book book){
+    public BookResponseDTO mapBookToBookResponseDTO(final Book book) {
         BookResponseDTO bookResponseDTO = new BookResponseDTO();
         bookResponseDTO.setId(book.getId());
         bookResponseDTO.setName(book.getName());
@@ -18,7 +18,7 @@ public class BookResponseMapper {
         return bookResponseDTO;
     }
 
-    public BookDeleteResponseDTO mapBookToBookDeleteResponseDTO(final Book book){
+    public BookDeleteResponseDTO mapBookToBookDeleteResponseDTO(final Book book) {
         BookDeleteResponseDTO bookDeleteResponseDTO = new BookDeleteResponseDTO();
         bookDeleteResponseDTO.setId(book.getId());
         bookDeleteResponseDTO.setName(book.getName());

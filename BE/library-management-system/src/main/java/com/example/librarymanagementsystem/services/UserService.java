@@ -42,7 +42,6 @@ public class UserService implements UserDetailsService {
     private final PasswordEncoder passwordEncoder;
 
 
-
     public UserService(UserResponseMapper userResponseMapper, MemberRequestMapper memberRequestMapper, MemberRepository memberRepository, PasswordEncoder passwordEncoder) {
         this.userResponseMapper = userResponseMapper;
         this.memberRequestMapper = memberRequestMapper;
@@ -50,54 +49,50 @@ public class UserService implements UserDetailsService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public List<MemberResponseDTO> getAllMembersService(){
+    public List<MemberResponseDTO> getAllMembersService() {
         logger.info("In getAllMembersService method");
 
-        List<Member> memberList = memberRepository.findMemberByUserRole("MEMBER");
+        List<Member> memberList = memberRepository.findMemberByUserRole(UserRole.MEMBER.toString());
 
-        if(memberList.isEmpty()){
+        if (memberList.isEmpty()) {
             return Collections.emptyList();
         }
 
         return memberList.stream().map(userResponseMapper::mapMemberToUserResponseDTO).toList();
     }
 
-    public MemberResponseDTO getMemberByUsernameService(final String username){
+    public MemberResponseDTO getMemberByUsernameService(final String username) {
         logger.info("In getMemberByUsernameService method");
 
         Member existingUser = getExistingUser(username);
-
-        if(existingUser == null){
+        if (existingUser == null) {
             logger.error(ErrorMessageGenerator.userNameNotFound(username));
             return null;
         }
         return userResponseMapper.mapMemberToUserResponseDTO(existingUser);
     }
-    public MemberResponseDTO registerUserService(final RegisterRequestDTO registerRequestDTO){
+
+    public MemberResponseDTO registerUserService(final RegisterRequestDTO registerRequestDTO) {
         logger.info("In registerUserService method");
 
         Member existingUser = getExistingUser(registerRequestDTO.getUsername());
-
-        if(existingUser == null){
-            Member newUser = memberRepository.save(memberRequestMapper
-                    .mapRegisterRequestDTOtoAppUser(registerRequestDTO));
+        if (existingUser == null) {
+            Member newUser = memberRepository.save(memberRequestMapper.mapRegisterRequestDTOtoAppUser(registerRequestDTO));
             return userResponseMapper.mapMemberToUserResponseDTO(newUser);
         }
         return null;
     }
 
-    public EditMemberResponseDTO editUserService(final String username, final EditMemberRequestDTO editMemberRequestDTO){
+    public EditMemberResponseDTO editUserService(final String username, final EditMemberRequestDTO editMemberRequestDTO) {
         logger.info("In editUserService method");
 
         Member existingUser = getExistingUser(username);
-
-        if(!username.equals(editMemberRequestDTO.getUsername())
-        && getExistingUser(editMemberRequestDTO.getUsername()) != null){
+        if (!username.equals(editMemberRequestDTO.getUsername()) && getExistingUser(editMemberRequestDTO.getUsername()) != null) {
             logger.error(ErrorMessageGenerator.usernameNotAvailable());
             return null;
         }
 
-        if(existingUser == null){
+        if (existingUser == null) {
             logger.error(ErrorMessageGenerator.userNameNotFound(username));
             throw new UsernameNotFoundException(ErrorMessageGenerator.userNameNotFound(username));
         }
@@ -108,49 +103,35 @@ public class UserService implements UserDetailsService {
     }
 
 
-    public AppUser changePasswordService(final ChangePasswordRequestDTO changePasswordRequestDTO){
+    public AppUser changePasswordService(final ChangePasswordRequestDTO changePasswordRequestDTO) {
         logger.info("In changePasswordService method");
-        Member appUser = getExistingUser(SecurityContextHolder.getContext().getAuthentication().getName());
 
-        if(appUser == null || !passwordEncoder.matches(changePasswordRequestDTO.getOldPassword(),appUser.getPassword())){
+        Member appUser = getExistingUser(SecurityContextHolder.getContext().getAuthentication().getName());
+        if (appUser == null || !passwordEncoder.matches(changePasswordRequestDTO.getOldPassword(), appUser.getPassword())) {
             return null;
         }
         appUser.setPassword(passwordEncoder.encode(changePasswordRequestDTO.getNewPassword()));
         return memberRepository.save(appUser);
     }
 
-//    public AppUser updateMemberEligibilityService(final String username){
-//        logger.info("In updateMemberEligibilityService method");
-//
-//        AppUser appUser = getExistingUser(username);
-//
-//        if(appUser == null || !passwordEncoder.matches(changePasswordRequestDTO.getOldPassword(),appUser.getPassword())){
-//            return null;
-//        }
-//        appUser.setPassword(passwordEncoder.encode(changePasswordRequestDTO.getNewPassword()));
-//        return userRepository.save(appUser);
-//    }
-
-    public MemberDeleteResponseDTO deleteUserService(final String id){
+    public MemberDeleteResponseDTO deleteUserService(final String id) {
         logger.info("In deleteUserService method");
 
         Member existingUser = memberRepository.findMemberById(id).orElse(null);
-
-        if(existingUser == null){
+        if (existingUser == null) {
             logger.error(ErrorMessageGenerator.userNotFound(id));
             throw new UsernameNotFoundException(ErrorMessageGenerator.userNotFound(id));
         }
-
         memberRepository.delete(existingUser);
         return userResponseMapper.mapMemberToMemberDeleteResponseDTO(existingUser);
     }
+
     @Override
     public UserDetails loadUserByUsername(String username) {
         logger.info("In loadUserByUsername service method");
 
         AppUser existingUser = getExistingUser(username);
         List<SimpleGrantedAuthority> simpleGrantedAuthorities = new ArrayList<>();
-
         if (existingUser == null) {
             logger.error(ErrorMessageGenerator.userNameNotFound(username));
             throw new UsernameNotFoundException(ErrorMessageGenerator.userNameNotFound(username));
@@ -161,10 +142,7 @@ public class UserService implements UserDetailsService {
         return new User(existingUser.getUsername(), existingUser.getPassword(), simpleGrantedAuthorities);
     }
 
-    public Member getExistingUser(final String username){
+    public Member getExistingUser(final String username) {
         return memberRepository.findMemberByUsername(username).orElse(null);
     }
-
-
-
 }

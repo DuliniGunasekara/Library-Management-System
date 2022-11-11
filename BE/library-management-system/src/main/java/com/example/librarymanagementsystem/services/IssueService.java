@@ -13,12 +13,12 @@ import com.example.librarymanagementsystem.repositories.BookRepository;
 import com.example.librarymanagementsystem.repositories.IssueRepository;
 import com.example.librarymanagementsystem.repositories.MemberRepository;
 import com.example.librarymanagementsystem.util.ErrorMessageGenerator;
-import java.util.Collections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -49,40 +49,36 @@ public class IssueService {
     }
 
 
-    public IssueResponseDTO issueBooksService(final IssueRequestDTO issueRequestDTO){
+    public IssueResponseDTO issueBooksService(final IssueRequestDTO issueRequestDTO) {
         logger.info("In issueBooksService method");
 
         Member member = userService.getExistingUser(issueRequestDTO.getMemberUsername());
 
-        if(member != null && member.isEligible()){
+        if (member != null && member.isEligible()) {
             member.setEligible(false);
 
-        }else{
+        } else {
             logger.error(ErrorMessageGenerator.memberIsNotEligible(issueRequestDTO.getMemberUsername()));
             return null;
         }
 
-        List<Book> bookList = issueRequestDTO
-                .getBookList()
-                .stream()
-                .map(id->bookRepository.findBookById(id).orElse(new Book()))
-                .filter(book -> book.getId() != null && book.getBookStatus().equals(BookStatus.AVAILABLE)).toList();
+        List<Book> bookList = issueRequestDTO.getBookList().stream().map(id -> bookRepository.findBookById(id).orElse(new Book())).filter(book -> book.getId() != null && book.getBookStatus().equals(BookStatus.AVAILABLE)).toList();
 
-        if(bookList.isEmpty()){
+        if (bookList.isEmpty()) {
             logger.error(ErrorMessageGenerator.requestedBooksAreNotAvailable());
             return null;
         }
         memberRepository.save(member);
-        Issue newIssue = issueRepository.save(issueRequestMapper.mapIssueRequestDTOtoIssue(issueRequestDTO,bookList));
+        Issue newIssue = issueRepository.save(issueRequestMapper.mapIssueRequestDTOtoIssue(issueRequestDTO, bookList));
         bookList.forEach(bookService::updateBookAvailability);
         return issueResponseMapper.mapIssueToIssueResponseDTO(newIssue);
     }
 
-    public List<BookHistoryResponseDTO> getBookHistoryService(){
+    public List<BookHistoryResponseDTO> getBookHistoryService() {
         logger.info("In getBookHistoryService method");
 
         List<Issue> issueList = issueRepository.findAllByMemberUsername(SecurityContextHolder.getContext().getAuthentication().getName());
-        if(issueList.isEmpty()){
+        if (issueList.isEmpty()) {
             logger.error(ErrorMessageGenerator.bookHistoryNotFound());
             return Collections.emptyList();
         }

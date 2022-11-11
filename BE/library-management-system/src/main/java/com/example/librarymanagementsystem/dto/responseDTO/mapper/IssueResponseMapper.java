@@ -1,16 +1,14 @@
 package com.example.librarymanagementsystem.dto.responseDTO.mapper;
 
-import com.example.librarymanagementsystem.domain.Book;
 import com.example.librarymanagementsystem.domain.Issue;
 import com.example.librarymanagementsystem.dto.responseDTO.BookHistoryResponseDTO;
-import com.example.librarymanagementsystem.dto.responseDTO.BookResponseDTO;
 import com.example.librarymanagementsystem.dto.responseDTO.IssueResponseDTO;
 import org.springframework.stereotype.Component;
 
 @Component
 public class IssueResponseMapper {
 
-    public IssueResponseDTO mapIssueToIssueResponseDTO(final Issue issue){
+    public IssueResponseDTO mapIssueToIssueResponseDTO(final Issue issue) {
         IssueResponseDTO issueResponseDTO = new IssueResponseDTO();
         issueResponseDTO.setId(issue.getId());
         issueResponseDTO.setBookList(issue.getBookList());
@@ -18,11 +16,10 @@ public class IssueResponseMapper {
         issueResponseDTO.setDueDate(issue.getDueDate().toString());
         issueResponseDTO.setMemberUsername(issue.getMemberUsername());
         issueResponseDTO.setIssueStatus(issue.getIssueStatus().toString());
-
         return issueResponseDTO;
     }
 
-    public BookHistoryResponseDTO mapIssueToBookHistoryResponseDTO(final Issue issue){
+    public BookHistoryResponseDTO mapIssueToBookHistoryResponseDTO(final Issue issue) {
         BookHistoryResponseDTO bookHistoryResponseDTO = new BookHistoryResponseDTO();
         bookHistoryResponseDTO.setIssueId(issue.getId());
         bookHistoryResponseDTO.setBookList(issue.getBookList());
