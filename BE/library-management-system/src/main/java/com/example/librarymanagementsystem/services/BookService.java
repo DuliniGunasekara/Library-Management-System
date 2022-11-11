@@ -101,4 +101,15 @@ public class BookService {
         return bookResponseMapper.mapBookToBookDeleteResponseDTO(book);
     }
 
+    public void updateBookAvailability(final Book book){
+
+            if(book.getBookStatus().equals(BookStatus.AVAILABLE)){
+                book.setBookStatus(BookStatus.NOT_AVAILABLE);
+            }else{
+                book.setBookStatus(BookStatus.AVAILABLE);
+            }
+            bookRepository.save(book);
+        }
 }
+
+

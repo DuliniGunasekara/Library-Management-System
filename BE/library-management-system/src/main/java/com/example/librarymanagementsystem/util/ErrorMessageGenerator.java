@@ -25,4 +25,8 @@ public class ErrorMessageGenerator {
     public static String requestedBooksAreNotAvailable(){
         return "Requested books are not available!";
     }
+
+    public static String bookHistoryNotFound(){
+        return "Book history not found!";
+    }
 }

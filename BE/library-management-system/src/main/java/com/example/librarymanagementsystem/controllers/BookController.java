@@ -3,7 +3,6 @@ package com.example.librarymanagementsystem.controllers;
 import com.example.librarymanagementsystem.dto.requestDTO.BookRequestDTO;
 import com.example.librarymanagementsystem.dto.responseDTO.BookDeleteResponseDTO;
 import com.example.librarymanagementsystem.dto.responseDTO.BookResponseDTO;
-import com.example.librarymanagementsystem.dto.responseDTO.UserDeleteResponseDTO;
 import com.example.librarymanagementsystem.services.BookService;
 import com.example.librarymanagementsystem.util.ValidateRequest;
 import org.slf4j.Logger;
