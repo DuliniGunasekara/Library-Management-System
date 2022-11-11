@@ -13,6 +13,7 @@ import com.example.librarymanagementsystem.repositories.BookRepository;
 import com.example.librarymanagementsystem.repositories.IssueRepository;
 import com.example.librarymanagementsystem.repositories.MemberRepository;
 import com.example.librarymanagementsystem.util.ErrorMessageGenerator;
+import java.util.Collections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -83,7 +84,7 @@ public class IssueService {
         List<Issue> issueList = issueRepository.findAllByMemberUsername(SecurityContextHolder.getContext().getAuthentication().getName());
         if(issueList.isEmpty()){
             logger.error(ErrorMessageGenerator.bookHistoryNotFound());
-            return null;
+            return Collections.emptyList();
         }
         return issueList.stream().map(issueResponseMapper::mapIssueToBookHistoryResponseDTO).toList();
     }
