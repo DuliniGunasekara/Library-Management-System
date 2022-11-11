@@ -17,4 +17,12 @@ public class ErrorMessageGenerator {
     public static String bookAlreadyExisting(final String isbnNumber){
         return "Book with ISBN:" + isbnNumber + " is already existing!";
     }
+
+    public static String memberIsNotEligible(final String username){
+        return "Member with username:" + username + " is not eligible!";
+    }
+
+    public static String requestedBooksAreNotAvailable(){
+        return "Requested books are not available!";
+    }
 }

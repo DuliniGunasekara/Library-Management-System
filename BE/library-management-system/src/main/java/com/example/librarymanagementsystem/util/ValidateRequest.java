@@ -3,9 +3,11 @@ package com.example.librarymanagementsystem.util;
 import com.example.librarymanagementsystem.dto.requestDTO.*;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDate;
+
 public class ValidateRequest {
 
-    public static boolean validateUserRequestDTO(final UserRequestDTO userRequestDTO){
+    public static boolean validateUserRequestDTO(final MemberRequestDTO userRequestDTO){
         if(StringUtils.hasLength(userRequestDTO.getUsername())
                 && StringUtils.hasLength(userRequestDTO.getPassword())){
             return true;
@@ -30,9 +32,9 @@ public class ValidateRequest {
         return false;
     }
 
-    public static boolean validateEditUserRequestDTO(final EditUserRequestDTO editUserRequestDTO){
-        if(StringUtils.hasLength(editUserRequestDTO.getUsername()) &&
-                StringUtils.hasLength(editUserRequestDTO.getUserRole())){
+    public static boolean validateEditUserRequestDTO(final EditMemberRequestDTO editMemberRequestDTO){
+        if(StringUtils.hasLength(editMemberRequestDTO.getUsername()) &&
+                StringUtils.hasLength(editMemberRequestDTO.getUserRole())){
             return true;
         }
         return false;
@@ -41,6 +43,23 @@ public class ValidateRequest {
     public static boolean validateBookRequestDTO(final BookRequestDTO bookRequestDTO){
         if(StringUtils.hasLength(bookRequestDTO.getIsbnNumber()) &&
                 StringUtils.hasLength(bookRequestDTO.getName())){
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean validateIssueRequestDTO(final IssueRequestDTO issueRequestDTO){
+        if(!issueRequestDTO.getBookList().isEmpty()
+        && StringUtils.hasLength(issueRequestDTO.getMemberUsername())
+        && StringUtils.hasLength(issueRequestDTO.getDueDate())
+        && compareDates(issueRequestDTO.getDueDate())){
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean compareDates(final String date){
+        if(UtilMethods.convertStringToDateFormat(date).compareTo(LocalDate.now()) > 0){
             return true;
         }
         return false;

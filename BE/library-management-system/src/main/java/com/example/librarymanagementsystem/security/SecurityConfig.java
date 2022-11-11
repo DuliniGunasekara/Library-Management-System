@@ -40,6 +40,7 @@ public class SecurityConfig {
             auth.antMatchers("/api/user/password").hasAnyAuthority(UserRole.LIBRARIAN.toString(),UserRole.MEMBER.toString());
             auth.antMatchers("/api/user/login").permitAll();
             auth.antMatchers("/api/book/**").permitAll();
+            auth.antMatchers("/api/issue/**").permitAll();
         }).sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)).httpBasic(Customizer.withDefaults()).apply(jwtSecurityConfigurerAdapter());
         return http.build();
     }

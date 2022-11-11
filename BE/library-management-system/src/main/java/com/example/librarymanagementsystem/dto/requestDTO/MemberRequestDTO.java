@@ -8,7 +8,8 @@ import lombok.experimental.Accessors;
 @Getter
 @Setter
 @NoArgsConstructor
-public class UserRequestDTO {
+public class MemberRequestDTO {
+
     private String username;
     private String password;
 }

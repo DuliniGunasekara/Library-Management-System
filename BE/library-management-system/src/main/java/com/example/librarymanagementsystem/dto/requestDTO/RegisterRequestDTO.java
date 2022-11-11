@@ -9,6 +9,6 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class RegisterRequestDTO extends UserRequestDTO{
+public class RegisterRequestDTO extends MemberRequestDTO{
     private String userRole;
 }

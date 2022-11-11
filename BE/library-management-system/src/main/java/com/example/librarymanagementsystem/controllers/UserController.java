@@ -3,10 +3,7 @@ package com.example.librarymanagementsystem.controllers;
 import com.example.librarymanagementsystem.constants.SecurityConstants;
 import com.example.librarymanagementsystem.domain.AppUser;
 import com.example.librarymanagementsystem.dto.requestDTO.*;
-import com.example.librarymanagementsystem.dto.responseDTO.EditUserResponseDTO;
-import com.example.librarymanagementsystem.dto.responseDTO.LoginResponseDTO;
-import com.example.librarymanagementsystem.dto.responseDTO.RegisterResponseDTO;
-import com.example.librarymanagementsystem.dto.responseDTO.UserResponseDTO;
+import com.example.librarymanagementsystem.dto.responseDTO.*;
 import com.example.librarymanagementsystem.dto.responseDTO.mapper.UserResponseMapper;
 import com.example.librarymanagementsystem.security.jwt.TokenProvider;
 import com.example.librarymanagementsystem.services.UserService;
@@ -22,6 +19,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/user")
@@ -45,8 +44,29 @@ public class UserController {
         this.userResponseMapper = userResponseMapper;
     }
 
+    @GetMapping
+    public  ResponseEntity<List<MemberResponseDTO>> getAllMembers(){
+        logger.info("In getAllMembers controller");
+
+        List<MemberResponseDTO> memberResponseDTOList = userService.getAllMembersService();
+
+        return new ResponseEntity<>(memberResponseDTOList,HttpStatus.OK);
+    }
+
+    @GetMapping("/{username}")
+    public ResponseEntity<MemberResponseDTO> getMemberByUsername(@PathVariable("username") final String username){
+        logger.info("In getMemberByUsername controller");
+
+        MemberResponseDTO memberResponseDTO = userService.getMemberByUsernameService(username);
+
+        if(memberResponseDTO == null){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(memberResponseDTO,HttpStatus.OK);
+    }
+
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDTO> login(@RequestBody final UserRequestDTO userRequestDTO){
+    public ResponseEntity<LoginResponseDTO> login(@RequestBody final MemberRequestDTO userRequestDTO){
         logger.info("In login controller");
 
         if(!ValidateRequest.validateUserRequestDTO(userRequestDTO)){
@@ -67,19 +87,19 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<UserResponseDTO> register(@RequestBody final RegisterRequestDTO registerRequestDTO){
+    public ResponseEntity<MemberResponseDTO> register(@RequestBody final RegisterRequestDTO registerRequestDTO){
         logger.info("In register controller");
 
         if(!ValidateRequest.validateRegisterRequestDTO(registerRequestDTO)){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-       UserResponseDTO userResponseDTO = userService.registerUserService(registerRequestDTO);
+       MemberResponseDTO memberResponseDTO = userService.registerUserService(registerRequestDTO);
 
-        if(userResponseDTO == null){
+        if(memberResponseDTO == null){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(userResponseDTO,HttpStatus.CREATED);
+        return new ResponseEntity<>(memberResponseDTO,HttpStatus.CREATED);
     }
 
     @PatchMapping("/password")
@@ -98,18 +118,56 @@ public class UserController {
         return HttpStatus.CREATED;
     }
 
+    //TODO:member eligibility
+
+//    @PatchMapping("/eligibility/{username}")
+//    public HttpStatus updateMemberEligibility(@PathVariable final String username){
+//        logger.info("In updateMemberEligibility controller");
+//
+//        if(!StringUtils.hasLength(username)){
+//            return HttpStatus.BAD_REQUEST;
+//        }
+//
+//        AppUser appUser = userService.changePasswordService(changePasswordRequestDTO);
+//
+//        if(appUser == null){
+//            return HttpStatus.BAD_REQUEST;
+//        }
+//        return HttpStatus.CREATED;
+//    }
+
     @PutMapping("/edit/{username}")
-    public ResponseEntity<EditUserResponseDTO> editUser(@PathVariable("username") final String username, @RequestBody final EditUserRequestDTO editUserRequestDTO){
-        if(!StringUtils.hasLength(username) && !ValidateRequest.validateEditUserRequestDTO(editUserRequestDTO)){
+    public ResponseEntity<EditMemberResponseDTO> editUser(@PathVariable("username") final String username, @RequestBody final EditMemberRequestDTO editMemberRequestDTO){
+        logger.info("In editUser controller");
+
+        if(!StringUtils.hasLength(username) && !ValidateRequest.validateEditUserRequestDTO(editMemberRequestDTO)){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        EditUserResponseDTO editUserResponseDTO = userService.editUserService(username,editUserRequestDTO);
+        EditMemberResponseDTO editUserResponseDTO = userService.editUserService(username, editMemberRequestDTO);
 
         if(editUserResponseDTO == null){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(editUserResponseDTO,HttpStatus.CREATED);
+
+    }
+
+    //TODO:userdeleteDTO
+    @DeleteMapping ("/delete/{id}")
+    public ResponseEntity<MemberResponseDTO> deleteUser(@PathVariable("id") final String id){
+        logger.info("In deleteUser controller");
+
+        if(!StringUtils.hasLength(id)){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        MemberResponseDTO memberResponseDTO = userService.deleteUserService(id);
+
+        if(memberResponseDTO == null){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(memberResponseDTO,HttpStatus.OK);
 
     }
 }
