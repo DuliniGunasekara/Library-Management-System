@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/user")
+@RequestMapping("/api")
 public class UserController {
 
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
@@ -44,7 +44,7 @@ public class UserController {
         this.userResponseMapper = userResponseMapper;
     }
 
-    @GetMapping
+    @GetMapping("/member")
     public  ResponseEntity<List<MemberResponseDTO>> getAllMembers(){
         logger.info("In getAllMembers controller");
 
@@ -53,7 +53,7 @@ public class UserController {
         return new ResponseEntity<>(memberResponseDTOList,HttpStatus.OK);
     }
 
-    @GetMapping("/{username}")
+    @GetMapping("/member/{username}")
     public ResponseEntity<MemberResponseDTO> getMemberByUsername(@PathVariable("username") final String username){
         logger.info("In getMemberByUsername controller");
 
@@ -86,7 +86,7 @@ public class UserController {
         return new ResponseEntity<>( loginResponse,httpHeaders,HttpStatus.OK);
     }
 
-    @PostMapping("/register")
+    @PostMapping("/member/register")
     public ResponseEntity<MemberResponseDTO> register(@RequestBody final RegisterRequestDTO registerRequestDTO){
         logger.info("In register controller");
 
@@ -118,25 +118,7 @@ public class UserController {
         return HttpStatus.CREATED;
     }
 
-    //TODO:member eligibility
-
-//    @PatchMapping("/eligibility/{username}")
-//    public HttpStatus updateMemberEligibility(@PathVariable final String username){
-//        logger.info("In updateMemberEligibility controller");
-//
-//        if(!StringUtils.hasLength(username)){
-//            return HttpStatus.BAD_REQUEST;
-//        }
-//
-//        AppUser appUser = userService.changePasswordService(changePasswordRequestDTO);
-//
-//        if(appUser == null){
-//            return HttpStatus.BAD_REQUEST;
-//        }
-//        return HttpStatus.CREATED;
-//    }
-
-    @PutMapping("/edit/{username}")
+    @PutMapping("/member/edit/{username}")
     public ResponseEntity<EditMemberResponseDTO> editUser(@PathVariable("username") final String username, @RequestBody final EditMemberRequestDTO editMemberRequestDTO){
         logger.info("In editUser controller");
 
@@ -153,16 +135,15 @@ public class UserController {
 
     }
 
-    //TODO:userdeleteDTO
-    @DeleteMapping ("/delete/{id}")
-    public ResponseEntity<MemberResponseDTO> deleteUser(@PathVariable("id") final String id){
+    @DeleteMapping ("/member/delete/{id}")
+    public ResponseEntity<MemberDeleteResponseDTO> deleteUser(@PathVariable("id") final String id){
         logger.info("In deleteUser controller");
 
         if(!StringUtils.hasLength(id)){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        MemberResponseDTO memberResponseDTO = userService.deleteUserService(id);
+        MemberDeleteResponseDTO memberResponseDTO = userService.deleteUserService(id);
 
         if(memberResponseDTO == null){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

@@ -29,4 +29,15 @@ public class ErrorMessageGenerator {
     public static String bookHistoryNotFound(){
         return "Book history not found!";
     }
+
+    public static String userNotFound(){
+        return "User not found!";
+    }
+    public static String usernameNotAvailable(){
+        return "Username not available!";
+    }
+
+    public static String bookISBNisExisting(){
+        return "Book ISBN is existing";
+    }
 }

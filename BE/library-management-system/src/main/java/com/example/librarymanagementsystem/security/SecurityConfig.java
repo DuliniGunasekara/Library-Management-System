@@ -36,11 +36,12 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable).authorizeRequests(auth -> {
-            auth.antMatchers("/api/user/register").hasAnyAuthority(UserRole.LIBRARIAN.toString());
-            auth.antMatchers("/api/user/password").hasAnyAuthority(UserRole.LIBRARIAN.toString(),UserRole.MEMBER.toString());
-            auth.antMatchers("/api/user/login").permitAll();
-            auth.antMatchers("/api/book/**").permitAll();
-            auth.antMatchers("/api/issue/**").permitAll();
+            auth.antMatchers("/api/member/**").hasAnyAuthority(UserRole.LIBRARIAN.toString());
+            auth.antMatchers("/api/password").hasAnyAuthority(UserRole.LIBRARIAN.toString(),UserRole.MEMBER.toString());
+            auth.antMatchers("/api/login").permitAll();
+            auth.antMatchers("/api/book/**").hasAnyAuthority(UserRole.LIBRARIAN.toString());
+            auth.antMatchers("/api/issue").hasAnyAuthority(UserRole.LIBRARIAN.toString());
+            auth.antMatchers("/api/issue/history").hasAnyAuthority(UserRole.MEMBER.toString());
         }).sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)).httpBasic(Customizer.withDefaults()).apply(jwtSecurityConfigurerAdapter());
         return http.build();
     }

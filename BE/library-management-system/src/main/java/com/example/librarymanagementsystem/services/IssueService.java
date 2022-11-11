@@ -56,7 +56,7 @@ public class IssueService {
 
         if(member != null && member.isEligible()){
             member.setEligible(false);
-            memberRepository.save(member);
+
         }else{
             logger.error(ErrorMessageGenerator.memberIsNotEligible(issueRequestDTO.getMemberUsername()));
             return null;
@@ -66,13 +66,13 @@ public class IssueService {
                 .getBookList()
                 .stream()
                 .map(id->bookRepository.findBookById(id).orElse(new Book()))
-                .filter(book -> book.getBookStatus().equals(BookStatus.AVAILABLE)).toList();
+                .filter(book -> book.getId() != null && book.getBookStatus().equals(BookStatus.AVAILABLE)).toList();
 
         if(bookList.isEmpty()){
             logger.error(ErrorMessageGenerator.requestedBooksAreNotAvailable());
             return null;
         }
-
+        memberRepository.save(member);
         Issue newIssue = issueRepository.save(issueRequestMapper.mapIssueRequestDTOtoIssue(issueRequestDTO,bookList));
         bookList.forEach(bookService::updateBookAvailability);
         return issueResponseMapper.mapIssueToIssueResponseDTO(newIssue);

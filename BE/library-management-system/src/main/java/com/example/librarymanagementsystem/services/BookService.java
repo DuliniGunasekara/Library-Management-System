@@ -78,7 +78,13 @@ public class BookService {
             logger.error(ErrorMessageGenerator.bookNotFound(id));
             return null;
         }
-
+        if(!book.getIsbnNumber().equals(bookRequestDTO.getIsbnNumber())){
+            Book checkISBNBook = bookRepository.findBookByIsbnNumber(bookRequestDTO.getIsbnNumber()).orElse(null);
+            if(checkISBNBook != null){
+                logger.error(ErrorMessageGenerator.bookISBNisExisting());
+                return null;
+            }
+        }
         book.setName(bookRequestDTO.getName());
         book.setIsbnNumber(bookRequestDTO.getIsbnNumber());
         book.setAuthor(bookRequestDTO.getAuthor());

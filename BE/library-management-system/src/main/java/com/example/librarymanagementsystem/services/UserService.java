@@ -8,6 +8,7 @@ import com.example.librarymanagementsystem.dto.requestDTO.EditMemberRequestDTO;
 import com.example.librarymanagementsystem.dto.requestDTO.RegisterRequestDTO;
 import com.example.librarymanagementsystem.dto.requestDTO.mapper.MemberRequestMapper;
 import com.example.librarymanagementsystem.dto.responseDTO.EditMemberResponseDTO;
+import com.example.librarymanagementsystem.dto.responseDTO.MemberDeleteResponseDTO;
 import com.example.librarymanagementsystem.dto.responseDTO.MemberResponseDTO;
 import com.example.librarymanagementsystem.dto.responseDTO.mapper.UserResponseMapper;
 import com.example.librarymanagementsystem.repositories.MemberRepository;
@@ -90,6 +91,12 @@ public class UserService implements UserDetailsService {
 
         Member existingUser = getExistingUser(username);
 
+        if(!username.equals(editMemberRequestDTO.getUsername())
+        && getExistingUser(editMemberRequestDTO.getUsername()) != null){
+            logger.error(ErrorMessageGenerator.usernameNotAvailable());
+            return null;
+        }
+
         if(existingUser == null){
             logger.error(ErrorMessageGenerator.userNameNotFound(username));
             throw new UsernameNotFoundException(ErrorMessageGenerator.userNameNotFound(username));
@@ -124,7 +131,7 @@ public class UserService implements UserDetailsService {
 //        return userRepository.save(appUser);
 //    }
 
-    public MemberResponseDTO deleteUserService(final String id){
+    public MemberDeleteResponseDTO deleteUserService(final String id){
         logger.info("In deleteUserService method");
 
         Member existingUser = memberRepository.findMemberById(id).orElse(null);
@@ -135,7 +142,7 @@ public class UserService implements UserDetailsService {
         }
 
         memberRepository.delete(existingUser);
-        return userResponseMapper.mapMemberToUserResponseDTO(existingUser);
+        return userResponseMapper.mapMemberToMemberDeleteResponseDTO(existingUser);
     }
     @Override
     public UserDetails loadUserByUsername(String username) {
@@ -157,5 +164,7 @@ public class UserService implements UserDetailsService {
     public Member getExistingUser(final String username){
         return memberRepository.findMemberByUsername(username).orElse(null);
     }
+
+
 
 }

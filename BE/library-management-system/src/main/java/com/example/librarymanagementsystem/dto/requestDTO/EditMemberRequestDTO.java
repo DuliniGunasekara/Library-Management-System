@@ -7,8 +7,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class EditMemberRequestDTO extends MemberRequestDTO {
-//    private String username;
+public class EditMemberRequestDTO  {
+    private String username;
     private String userRole;
 
 }
