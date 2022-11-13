@@ -77,6 +77,7 @@ public class UserService implements UserDetailsService {
 
         Member existingUser = getExistingUser(registerRequestDTO.getUsername());
         if (existingUser == null) {
+            registerRequestDTO.setPassword(passwordEncoder.encode(registerRequestDTO.getPassword()));
             Member newUser = memberRepository.save(memberRequestMapper.mapRegisterRequestDTOtoAppUser(registerRequestDTO));
             return userResponseMapper.mapMemberToUserResponseDTO(newUser);
         }
