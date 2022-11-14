@@ -31,18 +31,14 @@ jobs:
     - name: Build and create jar
       run: mvn clean package
       
+    # Build docker image
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag library-management-system:$(date +%s)
+      
     # Run tests
     - name: Run tests
       run: mvn test
       
-  deploy:
-    
-    needs: build
+     
+      
 
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v3
-    # Build docker image
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag library-management-system:$(date +%s)
