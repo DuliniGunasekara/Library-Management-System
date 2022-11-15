@@ -19,9 +19,11 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     private final TokenProvider tokenProvider;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
-    protected SecurityConfig(TokenProvider tokenProvider) {
+    protected SecurityConfig(TokenProvider tokenProvider, CustomAuthenticationEntryPoint customAuthenticationEntryPoint) {
         this.tokenProvider = tokenProvider;
+        this.customAuthenticationEntryPoint = customAuthenticationEntryPoint;
     }
 
     @Bean
@@ -36,13 +38,15 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable).authorizeRequests(auth -> {
-            auth.antMatchers("/api/member/**").hasAnyAuthority(UserRole.LIBRARIAN.toString());
-            auth.antMatchers("/api/password").hasAnyAuthority(UserRole.LIBRARIAN.toString(),UserRole.MEMBER.toString());
-            auth.antMatchers("/api/login").permitAll();
-            auth.antMatchers("/api/book/**").hasAnyAuthority(UserRole.LIBRARIAN.toString());
-            auth.antMatchers("/api/issue").hasAnyAuthority(UserRole.LIBRARIAN.toString());
-            auth.antMatchers("/api/issue/history").hasAnyAuthority(UserRole.MEMBER.toString());
-        }).sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)).httpBasic(Customizer.withDefaults()).apply(jwtSecurityConfigurerAdapter());
+                    auth.antMatchers("/api/member/**").hasAnyAuthority(UserRole.LIBRARIAN.toString());
+                    auth.antMatchers("/api/password").hasAnyAuthority(UserRole.LIBRARIAN.toString(), UserRole.MEMBER.toString());
+                    auth.antMatchers("/api/login").permitAll();
+                    auth.antMatchers("/api/book/**").hasAnyAuthority(UserRole.LIBRARIAN.toString());
+                    auth.antMatchers("/api/issue").hasAnyAuthority(UserRole.LIBRARIAN.toString());
+                    auth.antMatchers("/api/issue/history").hasAnyAuthority(UserRole.MEMBER.toString());
+                }).sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .httpBasic(Customizer.withDefaults()).apply(jwtSecurityConfigurerAdapter()).and().exceptionHandling().authenticationEntryPoint(customAuthenticationEntryPoint);
+
         return http.build();
     }
 }
