@@ -45,7 +45,7 @@ public class BookController {
         BookResponseDTO bookResponseDTO = bookService.getBookByIdService(id);
 
         if(bookResponseDTO == null){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(bookResponseDTO,HttpStatus.OK);
     }
@@ -61,7 +61,7 @@ public class BookController {
         BookResponseDTO bookResponseDTO = bookService.addBookService(bookRequestDTO);
 
         if(bookResponseDTO == null){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(bookResponseDTO,HttpStatus.CREATED);
     }
@@ -77,7 +77,7 @@ public class BookController {
         BookResponseDTO bookResponseDTO = bookService.editBookService(id,bookRequestDTO);
 
         if(bookResponseDTO == null){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(bookResponseDTO,HttpStatus.CREATED);
     }
@@ -89,7 +89,7 @@ public class BookController {
         BookDeleteResponseDTO bookDeleteResponseDTO = bookService.deleteBookService(id);
 
         if(bookDeleteResponseDTO == null){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(bookDeleteResponseDTO,HttpStatus.OK);
     }
