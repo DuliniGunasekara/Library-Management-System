@@ -2,12 +2,14 @@ package com.example.librarymanagementsystem.services;
 
 import com.example.librarymanagementsystem.constants.BookStatus;
 import com.example.librarymanagementsystem.domain.Book;
+import com.example.librarymanagementsystem.domain.Issue;
 import com.example.librarymanagementsystem.dto.requestDTO.BookRequestDTO;
 import com.example.librarymanagementsystem.dto.requestDTO.mapper.BookRequestMapper;
 import com.example.librarymanagementsystem.dto.responseDTO.BookDeleteResponseDTO;
 import com.example.librarymanagementsystem.dto.responseDTO.BookResponseDTO;
 import com.example.librarymanagementsystem.dto.responseDTO.mapper.BookResponseMapper;
 import com.example.librarymanagementsystem.repositories.BookRepository;
+import com.example.librarymanagementsystem.repositories.IssueRepository;
 import com.example.librarymanagementsystem.util.ErrorMessageGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 public class BookService {
@@ -25,10 +28,14 @@ public class BookService {
     private final BookResponseMapper bookResponseMapper;
     private final BookRequestMapper bookRequestMapper;
 
-    public BookService(BookRepository bookRepository, BookResponseMapper bookResponseMapper, BookRequestMapper bookRequestMapper) {
+    private final IssueRepository issueRepository;
+
+    public BookService(BookRepository bookRepository, BookResponseMapper bookResponseMapper, BookRequestMapper bookRequestMapper, IssueRepository issueRepository) {
         this.bookRepository = bookRepository;
         this.bookResponseMapper = bookResponseMapper;
         this.bookRequestMapper = bookRequestMapper;
+
+        this.issueRepository = issueRepository;
     }
 
     public List<BookResponseDTO> getAllBooksService() {
@@ -101,6 +108,15 @@ public class BookService {
             logger.error(ErrorMessageGenerator.bookNotFound(id));
             return null;
         }
+
+        List<Issue> issueList = issueRepository.findAll();
+       issueList =  issueList.stream().map(issue -> {
+          Book book1 = issue.getBookList().stream().filter(b->b.getId().equals(id)).findAny().orElse(new Book());
+          issue.getBookList().remove(book1);
+          return issue;
+
+       }).toList();
+       issueRepository.saveAll(issueList);
 
         bookRepository.delete(book);
         return bookResponseMapper.mapBookToBookDeleteResponseDTO(book);
