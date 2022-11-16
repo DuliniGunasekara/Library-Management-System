@@ -82,31 +82,31 @@ public class BookServiceTest {
         assertEquals("Pride and Premeditation",returnedBooks.get(0).getName());
     }
 
-//    @Test public void getAllBooksServiceTestFailed(){
-//        Book book1 = new Book()
-//                .setId("636e157ca29f183870443af1")
-//                .setName("Pride and Premeditation")
-//                .setBookStatus(BookStatus.AVAILABLE)
-//                .setAuthor("Tirzah Price")
-//                .setIsbnNumber("ISBN1234");
-//
-//        Book book2 = new Book()
-//                .setId("636e1eec65c50c2dda6422a8")
-//                .setBookStatus(BookStatus.AVAILABLE)
-//                .setName("Wuthering Heights")
-//                .setAuthor("Emily Bronte")
-//                .setIsbnNumber("ISBN1234");
-//
-//        List<Book> bookList = new ArrayList<>();
-//        bookList.add(book1);
-//        bookList.add(book2);
-//
-//        when(bookRepository.findAll()).thenReturn(bookList);
-//
-//        List<BookResponseDTO> returnedBooks = bookService.getAllBooksService();
-//        assertEquals(1,returnedBooks.size());
-//        assertEquals("Pride and Premeditation",returnedBooks.get(0).getName());
-//    }
+    @Test public void getAllBooksServiceTestFailed(){
+        Book book1 = new Book()
+                .setId("636e157ca29f183870443af1")
+                .setName("Pride and Premeditation")
+                .setBookStatus(BookStatus.AVAILABLE)
+                .setAuthor("Tirzah Price")
+                .setIsbnNumber("ISBN1234");
+
+        Book book2 = new Book()
+                .setId("636e1eec65c50c2dda6422a8")
+                .setBookStatus(BookStatus.AVAILABLE)
+                .setName("Wuthering Heights")
+                .setAuthor("Emily Bronte")
+                .setIsbnNumber("ISBN1234");
+
+        List<Book> bookList = new ArrayList<>();
+        bookList.add(book1);
+        bookList.add(book2);
+
+        when(bookRepository.findAll()).thenReturn(bookList);
+
+        List<BookResponseDTO> returnedBooks = bookService.getAllBooksService();
+        assertEquals(1,returnedBooks.size());
+        assertEquals("Pride and Premeditation",returnedBooks.get(0).getName());
+    }
 
     @Test public void addBookServiceTest(){
 

@@ -143,7 +143,6 @@ public class UserService implements UserDetailsService {
         List<SimpleGrantedAuthority> simpleGrantedAuthorities = new ArrayList<>();
         if (existingUser == null) {
             logger.error(ErrorMessageGenerator.userNameNotFound(username));
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ErrorMessageGenerator.userNameNotFound(username));
 
         } else {
             simpleGrantedAuthorities.add(new SimpleGrantedAuthority(existingUser.getUserRole().toString()));
