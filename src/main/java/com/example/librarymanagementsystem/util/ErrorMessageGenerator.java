@@ -39,4 +39,8 @@ public class ErrorMessageGenerator {
     public static String bookISBNisExisting() {
         return "Book ISBN is existing";
     }
+
+    public static String invalidRequestBody(){ return "Invalid request body!";}
+    public static String failedToAddResource(){ return "Failed to add resource!";}
+    public static String failedToEditResource(){ return "Failed to edit resource!";}
 }

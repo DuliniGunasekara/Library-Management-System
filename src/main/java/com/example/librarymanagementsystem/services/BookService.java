@@ -13,7 +13,9 @@ import com.example.librarymanagementsystem.repositories.IssueRepository;
 import com.example.librarymanagementsystem.util.ErrorMessageGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Collections;
 import java.util.List;
@@ -51,13 +53,14 @@ public class BookService {
     public BookResponseDTO getBookByIdService(final String id) {
         logger.info("In getBookByIdService method");
 
-        Book book = getBookById(id);
+       try{
 
-        if (book == null) {
-            logger.error(ErrorMessageGenerator.bookNotFound(id));
-            return null;
+           Book book = getBookById(id);
+           return bookResponseMapper.mapBookToBookResponseDTO(book);
+
+       }catch (Exception ex){
+           throw new ResponseStatusException(HttpStatus.NOT_FOUND,ErrorMessageGenerator.bookNotFound(id));
         }
-        return bookResponseMapper.mapBookToBookResponseDTO(book);
     }
 
     public BookResponseDTO addBookService(final BookRequestDTO bookRequestDTO) {
@@ -67,7 +70,7 @@ public class BookService {
 
         if (book != null) {
             logger.error(ErrorMessageGenerator.bookAlreadyExisting(bookRequestDTO.getIsbnNumber()));
-            return null;
+            throw new ResponseStatusException(HttpStatus.CONFLICT, ErrorMessageGenerator.bookAlreadyExisting(bookRequestDTO.getIsbnNumber()));
         }
 
         bookRequestDTO.setBookStatus(BookStatus.AVAILABLE.toString());
@@ -82,13 +85,13 @@ public class BookService {
 
         if (book == null) {
             logger.error(ErrorMessageGenerator.bookNotFound(id));
-            return null;
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,ErrorMessageGenerator.bookNotFound(id));
         }
         if (!book.getIsbnNumber().equals(bookRequestDTO.getIsbnNumber())) {
             Book checkISBNBook = bookRepository.findBookByIsbnNumber(bookRequestDTO.getIsbnNumber()).orElse(null);
             if (checkISBNBook != null) {
                 logger.error(ErrorMessageGenerator.bookISBNisExisting());
-                return null;
+                throw new ResponseStatusException(HttpStatus.CONFLICT, ErrorMessageGenerator.bookAlreadyExisting(bookRequestDTO.getIsbnNumber()));
             }
         }
         book.setName(bookRequestDTO.getName());
@@ -106,17 +109,12 @@ public class BookService {
 
         if (book == null) {
             logger.error(ErrorMessageGenerator.bookNotFound(id));
-            return null;
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,ErrorMessageGenerator.bookNotFound(id));
         }
 
-        List<Issue> issueList = issueRepository.findAll();
-       issueList =  issueList.stream().map(issue -> {
-          Book book1 = issue.getBookList().stream().filter(b->b.getId().equals(id)).findAny().orElse(new Book());
-          issue.getBookList().remove(book1);
-          return issue;
-
-       }).toList();
-       issueRepository.saveAll(issueList);
+        final List<Issue> issueList = issueRepository.findAll();
+        issueList.forEach(issue -> issue.getBookList().removeIf(b->b.equals(book)));
+        issueRepository.saveAll(issueList);
 
         bookRepository.delete(book);
         return bookResponseMapper.mapBookToBookDeleteResponseDTO(book);

@@ -4,6 +4,7 @@ import com.example.librarymanagementsystem.dto.requestDTO.BookRequestDTO;
 import com.example.librarymanagementsystem.dto.responseDTO.BookDeleteResponseDTO;
 import com.example.librarymanagementsystem.dto.responseDTO.BookResponseDTO;
 import com.example.librarymanagementsystem.services.BookService;
+import com.example.librarymanagementsystem.util.ErrorMessageGenerator;
 import com.example.librarymanagementsystem.util.ValidateRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -43,10 +45,6 @@ public class BookController {
         logger.info("In getBookById controller");
 
         BookResponseDTO bookResponseDTO = bookService.getBookByIdService(id);
-
-        if(bookResponseDTO == null){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
         return new ResponseEntity<>(bookResponseDTO,HttpStatus.OK);
     }
 
@@ -55,13 +53,13 @@ public class BookController {
         logger.info("In addBook controller");
 
         if(!ValidateRequest.validateBookRequestDTO(bookRequestDTO)){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ErrorMessageGenerator.invalidRequestBody());
         }
 
         BookResponseDTO bookResponseDTO = bookService.addBookService(bookRequestDTO);
 
         if(bookResponseDTO == null){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorMessageGenerator.failedToAddResource());
         }
         return new ResponseEntity<>(bookResponseDTO,HttpStatus.CREATED);
     }
@@ -71,13 +69,13 @@ public class BookController {
         logger.info("In editBook controller");
 
         if(!StringUtils.hasLength(id) && ValidateRequest.validateBookRequestDTO(bookRequestDTO)){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ErrorMessageGenerator.invalidRequestBody());
         }
 
         BookResponseDTO bookResponseDTO = bookService.editBookService(id,bookRequestDTO);
 
         if(bookResponseDTO == null){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorMessageGenerator.failedToEditResource());
         }
         return new ResponseEntity<>(bookResponseDTO,HttpStatus.CREATED);
     }
