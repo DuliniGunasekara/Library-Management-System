@@ -15,8 +15,10 @@ import com.example.librarymanagementsystem.repositories.MemberRepository;
 import com.example.librarymanagementsystem.util.ErrorMessageGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Collections;
 import java.util.List;
@@ -59,18 +61,20 @@ public class IssueService {
 
         } else {
             logger.error(ErrorMessageGenerator.memberIsNotEligible(issueRequestDTO.getMemberUsername()));
-            return null;
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,ErrorMessageGenerator.memberIsNotEligible(issueRequestDTO.getMemberUsername()));
         }
 
-        List<Book> bookList = issueRequestDTO.getBookList().stream().map(id -> bookRepository.findBookById(id).orElse(new Book())).filter(book -> book.getId() != null && book.getBookStatus().equals(BookStatus.AVAILABLE)).toList();
+        List<Book> bookList = new java.util.ArrayList<>(issueRequestDTO.getBookList().stream().map(id -> bookRepository.findBookById(id).orElse(new Book())).filter(book -> book.getId() != null).toList());
+        List<Book> availableBooks = bookList.stream().filter(b-> b.getBookStatus().equals(BookStatus.AVAILABLE)).toList();
 
-        if (bookList.isEmpty()) {
-            logger.error(ErrorMessageGenerator.requestedBooksAreNotAvailable());
-            return null;
+        if (bookList.size() != availableBooks.size()) {
+            bookList.removeAll(availableBooks);
+            logger.error(ErrorMessageGenerator.requestedBooksAreNotAvailable(bookList));
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,ErrorMessageGenerator.requestedBooksAreNotAvailable(bookList));
         }
         memberRepository.save(member);
-        Issue newIssue = issueRepository.save(issueRequestMapper.mapIssueRequestDTOtoIssue(issueRequestDTO, bookList));
-        bookList.forEach(bookService::updateBookAvailability);
+        Issue newIssue = issueRepository.save(issueRequestMapper.mapIssueRequestDTOtoIssue(issueRequestDTO, availableBooks));
+        availableBooks.forEach(bookService::updateBookAvailability);
         return issueResponseMapper.mapIssueToIssueResponseDTO(newIssue);
     }
 

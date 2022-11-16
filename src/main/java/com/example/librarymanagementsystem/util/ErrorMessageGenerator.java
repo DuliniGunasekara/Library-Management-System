@@ -1,5 +1,9 @@
 package com.example.librarymanagementsystem.util;
 
+import com.example.librarymanagementsystem.domain.Book;
+
+import java.util.List;
+
 public class ErrorMessageGenerator {
 
     private ErrorMessageGenerator(){}
@@ -28,8 +32,10 @@ public class ErrorMessageGenerator {
         return "Member with username:" + username + " already existing!";
     }
 
-    public static String requestedBooksAreNotAvailable() {
-        return "Requested books are not available!";
+    public static String requestedBooksAreNotAvailable(List<Book> bookList) {
+
+        List<String> bookNames = bookList.stream().map(Book::getName).toList();
+        return "Books: "+bookNames+" are not available!";
     }
 
     public static String bookHistoryNotFound() {

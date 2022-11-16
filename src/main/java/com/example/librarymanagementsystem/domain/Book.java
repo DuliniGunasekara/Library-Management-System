@@ -24,6 +24,18 @@ public class Book {
     private String isbnNumber;
     private String name;
     private String author;
+
+    @Override
+    public String toString() {
+        return "Book{" +
+                "id='" + id + '\'' +
+                ", isbnNumber='" + isbnNumber + '\'' +
+                ", name='" + name + '\'' +
+                ", author='" + author + '\'' +
+                ", bookStatus=" + bookStatus +
+                '}';
+    }
+
     private BookStatus bookStatus;
 
     @Override
