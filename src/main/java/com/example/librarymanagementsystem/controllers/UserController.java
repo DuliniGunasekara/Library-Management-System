@@ -72,7 +72,7 @@ public class UserController {
         logger.info("In login controller");
 
         if(!ValidateRequest.validateUserRequestDTO(userRequestDTO)){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ErrorMessageGenerator.invalidRequestBody());
         }
 
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userRequestDTO.getUsername(), userRequestDTO.getPassword());
