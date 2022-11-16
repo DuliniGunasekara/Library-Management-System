@@ -24,6 +24,10 @@ public class ErrorMessageGenerator {
         return "Member with username:" + username + " is not eligible!";
     }
 
+    public static String memberUsernameAlreadyExisting(final String username) {
+        return "Member with username:" + username + " already existing!";
+    }
+
     public static String requestedBooksAreNotAvailable() {
         return "Requested books are not available!";
     }
@@ -41,6 +45,10 @@ public class ErrorMessageGenerator {
     }
 
     public static String invalidRequestBody(){ return "Invalid request body!";}
+    public static String invalidRequest(){ return "Invalid request!";}
     public static String failedToAddResource(){ return "Failed to add resource!";}
     public static String failedToEditResource(){ return "Failed to edit resource!";}
+    public static String internalServerError(){ return "Internal Server error";}
+    public static String newPasswordHasUsedBefore(){ return "New Password has used before";}
+    public static String oldPasswordNotMatch(){ return "Old password is incorrect";}
 }

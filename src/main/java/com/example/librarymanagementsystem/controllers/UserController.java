@@ -7,6 +7,7 @@ import com.example.librarymanagementsystem.dto.responseDTO.*;
 import com.example.librarymanagementsystem.dto.responseDTO.mapper.UserResponseMapper;
 import com.example.librarymanagementsystem.security.jwt.TokenProvider;
 import com.example.librarymanagementsystem.services.UserService;
+import com.example.librarymanagementsystem.util.ErrorMessageGenerator;
 import com.example.librarymanagementsystem.util.ValidateRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +20,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -60,7 +62,7 @@ public class UserController {
         MemberResponseDTO memberResponseDTO = userService.getMemberByUsernameService(username);
 
         if(memberResponseDTO == null){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorMessageGenerator.internalServerError());
         }
         return new ResponseEntity<>(memberResponseDTO,HttpStatus.OK);
     }
@@ -91,13 +93,13 @@ public class UserController {
         logger.info("In register controller");
 
         if(!ValidateRequest.validateRegisterRequestDTO(registerRequestDTO)){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ErrorMessageGenerator.invalidRequestBody());
         }
 
        MemberResponseDTO memberResponseDTO = userService.registerUserService(registerRequestDTO);
 
         if(memberResponseDTO == null){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorMessageGenerator.internalServerError());
         }
         return new ResponseEntity<>(memberResponseDTO,HttpStatus.CREATED);
     }
@@ -107,13 +109,13 @@ public class UserController {
         logger.info("In changePassword controller");
 
         if(!ValidateRequest.validateChangePasswordRequestDTO(changePasswordRequestDTO)){
-            return HttpStatus.BAD_REQUEST;
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ErrorMessageGenerator.invalidRequestBody());
         }
 
         AppUser appUser = userService.changePasswordService(changePasswordRequestDTO);
 
         if(appUser == null){
-            return HttpStatus.BAD_REQUEST;
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorMessageGenerator.internalServerError());
         }
         return HttpStatus.CREATED;
     }
@@ -123,13 +125,13 @@ public class UserController {
         logger.info("In editUser controller");
 
         if(!StringUtils.hasLength(username) && !ValidateRequest.validateEditUserRequestDTO(editMemberRequestDTO)){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ErrorMessageGenerator.invalidRequestBody());
         }
 
         EditMemberResponseDTO editUserResponseDTO = userService.editUserService(username, editMemberRequestDTO);
 
         if(editUserResponseDTO == null){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorMessageGenerator.internalServerError());
         }
         return new ResponseEntity<>(editUserResponseDTO,HttpStatus.CREATED);
 
@@ -140,13 +142,13 @@ public class UserController {
         logger.info("In deleteUser controller");
 
         if(!StringUtils.hasLength(id)){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ErrorMessageGenerator.invalidRequest());
         }
 
         MemberDeleteResponseDTO memberResponseDTO = userService.deleteUserService(id);
 
         if(memberResponseDTO == null){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorMessageGenerator.internalServerError());
         }
         return new ResponseEntity<>(memberResponseDTO,HttpStatus.OK);
 
