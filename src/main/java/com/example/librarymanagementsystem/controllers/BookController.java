@@ -87,8 +87,8 @@ public class BookController {
         BookDeleteResponseDTO bookDeleteResponseDTO = bookService.deleteBookService(id);
 
         if(bookDeleteResponseDTO == null){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorMessageGenerator.internalServerError());
         }
-        return new ResponseEntity<>(bookDeleteResponseDTO,HttpStatus.OK);
+        return new ResponseEntity<>(bookDeleteResponseDTO,HttpStatus.NO_CONTENT);
     }
 }
